@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Game</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #e0f7fa, #b3e5fc);
+            color: #333;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+        .quiz-container {
+            width: 60%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 36px;
+            font-weight: bold;
+            color: #00796b;
+        }
+        .question {
+            font-size: 24px;
+            margin-bottom: 25px;
+            font-weight: 600;
+            color: #00796b;
+        }
+        .options button {
+            display: block;
+            width: 80%;
+            padding: 14px;
+            margin: 12px auto;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #4caf50;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background-color 0.3s ease;
+        }
+        .options button:hover {
+            background-color: #388e3c;
+            transform: translateY(-4px);
+        }
+        .result {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #00796b;
+        }
+        .next {
+            background: #00897b;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 20px;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .next:hover {
+            background: #00796b;
+            transform: translateY(-4px);
+        }
+        .next:disabled {
+            background: #cfd8dc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Quiz Game</h1>
+        <div id="question-container">
+            <p class="question" id="question"></p>
+            <div class="options" id="options"></div>
+        </div>
+        <button class="next" onclick="nextQuestion()" id="next-btn" disabled>Next</button>
+        <p class="result" id="result"></p>
+    </div>
+
+    <script>
+        const questions = [
+    { question: "Which of the following is NOT a task of SCM?", options: ["Identifying changes", "Controlling changes", "Marketing the software", "Reporting changes to stakeholders"], answer: "Marketing the software" },
+    { question: "SCM starts at which phase of software development?", options: ["After testing", "During software maintenance", "At the beginning of the project", "Only after release"], answer: "At the beginning of the project" },
+    { question: "Which of the following is NOT an example of a Software Configuration Item (SCI)?", options: ["Source code", "Software tools", "Team meetings", "Data dictionaries"], answer: "Team meetings" },
+    { question: "Why is change control important in SCM?", options: ["It helps developers work faster", "It prevents unapproved changes", "It allows anyone to make modifications", "It removes the need for documentation"], answer: "It prevents unapproved changes" },
+    { question: "Which task in SCM ensures tracking of different software versions?", options: ["Release Management", "Change Control", "Version Control", "System Build"], answer: "Version Control" },
+    { question: "At which CMM level are processes documented but not checked for quality?", options: ["Initial", "Defined", "Managed", "Optimizing"], answer: "Defined" },
+    { question: "What is the main focus of the 'Optimizing' level in CMM?", options: ["Continuous improvement", "Just following a set of rules", "Tracking bugs", "Avoiding changes"], answer: "Continuous improvement" },
+    { question: "In which CMM level does a company track project performance but not yet optimize it?", options: ["Initial", "Repeatable", "Managed", "Defined"], answer: "Managed" },
+    { question: "Which CMM level represents a chaotic development process?", options: ["Defined", "Initial", "Repeatable", "Optimizing"], answer: "Initial" },
+    { question: "At what level do organizations have a structured but basic process that is repeated for similar projects?", options: ["Repeatable", "Defined", "Optimizing", "Initial"], answer: "Repeatable" },
+    { question: "Legacy code usually lacks what?", options: ["Documentation", "Tests", "Comments", "Bugs"], answer: "Tests" },
+    { question: "Which refactoring technique involves adding a new function without modifying the existing one?", options: ["Sprout technique", "Wrap technique", "Scratch refactoring", "Reverse engineering"], answer: "Wrap technique" },
+    { question: "Why is unit testing important for legacy code?", options: ["It makes the code more complex", "It ensures changes do not break functionality", "It removes old dependencies", "It speeds up software execution"], answer: "It ensures changes do not break functionality" },
+    { question: "What is the first step when working with legacy code?", options: ["Remove dependencies", "Identify seams", "Refactor everything", "Delete unnecessary code"], answer: "Identify seams" },
+    { question: "What is Scratch Refactoring?", options: ["Making small changes just to understand the code", "Deleting unnecessary functions", "Changing all variable names", "Ignoring old code"], answer: "Making small changes just to understand the code" },
+    { question: "Why is software release management important?", options: ["It helps control software versions", "It allows faster releases without testing", "It removes the need for SCM", "It is only used by small teams"], answer: "It helps control software versions" },
+    { question: "What is the first step in the release management process?", options: ["Deployment", "Testing", "Planning", "Coding"], answer: "Planning" },
+    { question: "What is meant by 'Planning Backward' in software releases?", options: ["Starting with the release date and scheduling tasks backward", "Starting development first, then planning later", "Delaying software releases", "Ignoring deadlines"], answer: "Starting with the release date and scheduling tasks backward" },
+    { question: "Which phase ensures that all identified bugs are fixed before release?", options: ["Development", "Design", "Testing", "Deployment"], answer: "Testing" },
+    { question: "Who is responsible for ensuring that the release meets the deadline?", options: ["Business Project Manager", "Release Manager", "Configuration Manager", "Testing Engineer"], answer: "Release Manager" },
+    { question: "Which testing method checks if an application meets user requirements?", options: ["Unit Testing", "Functional Testing", "Regression Testing", "Mutation Testing"], answer: "Functional Testing" },
+    { question: "What does Performance Testing check?", options: ["How well the software handles high loads", "If the software is bug-free", "If the software looks good", "If the software has a good UI"], answer: "How well the software handles high loads" },
+    { question: "What does Security Testing ensure?", options: ["The app runs fast", "The app is free of errors", "The app is safe from hackers", "The app can handle heavy loads"], answer: "The app is safe from hackers" },
+    { question: "Regression Testing is used to:", options: ["Check if new changes affect old functionalities", "Improve software performance", "Test only new features", "Increase software security"], answer: "Check if new changes affect old functionalities" },
+    { question: "What is End-to-End Testing?", options: ["Testing individual components", "Testing the entire application workflow", "Testing only the UI", "Testing only the backend"], answer: "Testing the entire application workflow" },
+    { question: "What is Version Control used for?", options: ["Managing different versions of software", "Deleting old versions of software", "Increasing software speed", "Reducing software complexity"], answer: "Managing different versions of software" },
+    { question: "Which of the following is NOT a type of testing?", options: ["API Testing", "Stress Testing", "Security Testing", "Software Marketing"], answer: "Software Marketing" },
+    { question: "Which of these is a formal approach to software development?", options: ["Capability Maturity Model", "Agile Model", "Informal Testing", "Trial and Error"], answer: "Capability Maturity Model" },
+    { question: "What is the primary benefit of Release Management?", options: ["It speeds up development", "It ensures smooth updates", "It increases software complexity", "It removes testing requirements"], answer: "It ensures smooth updates" },
+    { question: "Why is Configuration Management important?", options: ["It prevents unauthorized changes", "It eliminates the need for software updates", "It replaces documentation", "It only applies to small projects"], answer: "It prevents unauthorized changes" }
+];
+
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        function loadQuestion() {
+            const questionElement = document.getElementById("question");
+            const optionsElement = document.getElementById("options");
+            const nextBtn = document.getElementById("next-btn");
+            nextBtn.disabled = true;
+            questionElement.textContent = questions[currentQuestionIndex].question;
+            optionsElement.innerHTML = "";
+            questions[currentQuestionIndex].options.forEach(option => {
+                const button = document.createElement("button");
+                button.textContent = option;
+                button.onclick = () => {
+                    checkAnswer(option);
+                    nextBtn.disabled = false;
+                };
+                optionsElement.appendChild(button);
+            });
+        }
+
+        function checkAnswer(selected) {
+            const correctAnswer = questions[currentQuestionIndex].answer;
+            const resultElement = document.getElementById("result");
+            if (selected === correctAnswer) {
+                score++;
+                resultElement.textContent = "Correct!";
+                resultElement.style.color = "#4caf50";
+            } else {
+                resultElement.textContent = `Wrong! Correct answer: ${correctAnswer}`;
+                resultElement.style.color = "#f44336";
+            }
+        }
+
+        function nextQuestion() {
+            document.getElementById("result").textContent = "";
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                document.getElementById("question-container").innerHTML = `<h2>Quiz Completed!</h2><p>Your score: ${score}/${questions.length}</p>`;
+                document.getElementById("next-btn").style.display = 'none';
+            }
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
